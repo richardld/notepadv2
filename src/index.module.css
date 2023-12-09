@@ -1,0 +1,28 @@
+@keyframes blink {
+  0%, 100% {
+      background-color: transparent;
+  }
+  50% {
+      background-color: rgb(15 23 42);
+  }
+}
+
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  margin: -10px;
+}
+
+:root {
+  --rich-black: #001219ff;
+  --midnight-green: #005f73ff;
+  --dark-cyan: #0a9396ff;
+  --tiffany-blue: #94d2bdff;
+  --vanilla: #e9d8a6ff;
+  --gamboge: #ee9b00ff;
+  --alloy-orange: #ca6702ff;
+  --rust: #bb3e03ff;
+  --rufous: #ae2012ff;
+  --auburn: #9b2226ff;
+}

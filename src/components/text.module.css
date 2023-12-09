@@ -1,0 +1,47 @@
+.editorContainer {
+  font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  width: 100%;
+  height: calc(100% - 30px);
+  background: #fff;
+  padding: 12px;
+  color: #000;
+  position: relative;
+  text-align: left;
+  display: flex;
+}
+
+.editorInput {
+  font-size: 13px;
+  resize: none;
+  position: relative;
+  tab-size: 1;
+  outline: 0;
+  caret-color: #444;
+  flex-grow: 1;
+}
+
+.editorPlaceholder {
+  color: #999;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 20px;
+  left: 10px;
+  font-size: 15px;
+  user-select: none;
+  display: inline-block;
+  pointer-events: none;
+}
+
+.editorParagraph {
+  margin: 0px;
+  padding: 0px;
+  position: relative;
+}
+
+.hashtag {
+  color: var(--rich-black);
+  font-weight: 300;
+  font-style: italic;
+  background-color: var(--tiffany-blue);
+}
