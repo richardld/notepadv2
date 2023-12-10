@@ -8,6 +8,7 @@
   position: relative;
   text-align: left;
   display: flex;
+  overflow-x: hidden;
 }
 
 .editorInput {

@@ -12,7 +12,12 @@ import { rendererConfig } from './webpack.renderer.config';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    extraResource: [
+      "./src/models/llama-2-7b-chat.gguf",
+    ],
+    icon: './images/logo.png'
   },
+  
   rebuildConfig: {},
   makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
   plugins: [
@@ -27,6 +32,14 @@ const config: ForgeConfig = {
             html: './src/index.html',
             js: './src/renderer.ts',
             name: 'main_window',
+            preload: {
+              js: './src/preload.ts',
+            },
+          },
+          {
+            html: './src/preferences.html',
+            js: './src/renderer.ts',
+            name: 'preferences_window',
             preload: {
               js: './src/preload.ts',
             },

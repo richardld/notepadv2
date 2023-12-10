@@ -1,18 +1,28 @@
 import { PromptNode, $createPromptNode } from "../../nodes/PromptNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { DecoratorNode, TextNode, NodeKey, $getRoot, createCommand, $createTextNode, $createLineBreakNode, CommandListener } from 'lexical';
+import { DecoratorNode, TextNode, NodeKey, $getRoot, createCommand, $createTextNode, $createLineBreakNode, CommandListener, $getNodeByKey } from 'lexical';
 import { ReactNode, useEffect } from "react";
 import { getResponse } from "../../api"
 import { HashtagNode } from "@lexical/hashtag"; 
+import { ipcRenderer } from "electron";
 
 interface Payload {
   update: string;
-  promptNode: PromptNode;
+  key: string;
 }
+
+declare global {
+  interface Window {
+    electronAPI?: any;
+  }
+}
+
 export function PromptPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext()
   const UPDATE_COMPLETION_COMMAND = createCommand()
   const FINISH_COMPLETION_COMMAND = createCommand()
+
+  const promptNodes: { [id: string] : PromptNode } = {}
 
   useEffect(() => {
     if (!editor.hasNodes([PromptNode])) {
@@ -23,16 +33,24 @@ export function PromptPlugin(): JSX.Element {
       UPDATE_COMPLETION_COMMAND,
       (payload: Payload): any => {
         let update = payload.update
-        let promptNode = payload.promptNode
+        let promptNode = $getNodeByKey(payload.key)
         promptNode.updateCompletion(update)
       },
       1,
     )
 
+    window.electronAPI.onUpdate((value: string, key: string) => {
+      editor.dispatchCommand(UPDATE_COMPLETION_COMMAND, {
+        update: value,
+        key: key
+      })
+    })
+
     editor.registerCommand(
       FINISH_COMPLETION_COMMAND,
       (payload: Payload): any => {
-        let promptNode = payload.promptNode
+        let promptNode = $getNodeByKey(payload.key)
+
         let textNode = $createTextNode(promptNode.getResponse().trim())
         promptNode.replace(textNode)
         textNode.insertAfter($createLineBreakNode())
@@ -47,7 +65,7 @@ export function PromptPlugin(): JSX.Element {
       1,
     )
 
-    editor.registerNodeTransform(HashtagNode, textNode => {
+    editor.registerNodeTransform(HashtagNode, async textNode => {
       const regex = /\\([^\\])+\\/i
       const found = textNode.getTextContent().match(regex)
       if (found) {
@@ -55,22 +73,29 @@ export function PromptPlugin(): JSX.Element {
           const prompt = found[0].replaceAll("\\", "").trim()
           const promptNode = $createPromptNode(prompt)
           const existingText = $getRoot().getTextContent()
-          const response = getResponse(prompt, existingText, (update) => {
-            editor.dispatchCommand(UPDATE_COMPLETION_COMMAND, {
-              update: update,
-              promptNode: promptNode
+
+          textNode.replace(promptNode)
+          let key = promptNode.getKey()
+          const response = window.electronAPI.getResponse(prompt, existingText, key)
+
+          if (false) {
+            const response = getResponse(prompt, existingText, (update) => {
+              editor.dispatchCommand(UPDATE_COMPLETION_COMMAND, {
+                update: update,
+                promptNode: promptNode
+              })
             })
-          })
-        
+          }
+
           // Finally, append the paragraph to the root
-          textNode.replace(promptNode);
 
           response.then(() => {
             editor.dispatchCommand(FINISH_COMPLETION_COMMAND, {
-              promptNode: promptNode
+              key: promptNode.getKey()
             })
           })
-      }
+        }
+      
     })
   }, [editor]);
 

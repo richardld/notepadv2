@@ -38,4 +38,10 @@ export const rules: Required<ModuleOptions>['rules'] = [
       }
     }
   },
+  {
+    test: /\.gguf?$/,
+    use: {
+      loader: 'file-loader',
+    }
+  },
 ];

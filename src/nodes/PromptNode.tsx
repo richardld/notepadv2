@@ -16,10 +16,10 @@ export class PromptNode extends DecoratorNode<ReactNode> {
   }
 
   static clone(node: LexicalNode) {
-    return new PromptNode(node.prompt, node.key, node.response);
+    return new PromptNode(node.prompt, node.response, node.__key);
   }
 
-  constructor(prompt: string, key:string, response: string) {
+  constructor(prompt: string, response: string, key?: NodeKey) {
     super(key);
     this.prompt = prompt;
     this.response = response ? response : "" 
